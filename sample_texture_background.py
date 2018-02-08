@@ -115,7 +115,7 @@ def main():
                             rotate_camera_by_angle(camera, rotate_angle, obj)
 
                             bpy.context.scene.render.file_path = "Documents/test/%s/%s%s%sCameraPose%dFrame%d.png" % (
-                                obj.name, background_name, obj.name, texture_name, camera_pos, x)
+                                obj.name, obj.name,background_name, texture_name, camera_pos, x)
                             bpy.ops.render.render(write_still=True, use_viewport=True)
 
 
