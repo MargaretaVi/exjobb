@@ -1,7 +1,9 @@
 import bpy, os, math, mathutils
+
 # camera.location = (7.4811, -6.5076, 5.3437) original camera position in blender
 
 bpy.context.scene.render.use_raytrace = False
+
 
 def add_background(filepath):
     img = bpy.data.images.load(filepath)
@@ -34,7 +36,7 @@ def material_for_texture(fname):
     return mat
 
 
-def pointCameraToTarget(cam, object):
+def point_camera_to_target(cam, object):
     # we want to point the camera towards the object.location(x,y,z), we rotate around the z-axis
     dx = object.location.x - cam.location.x
     dy = object.location.y - cam.location.y
@@ -45,13 +47,13 @@ def pointCameraToTarget(cam, object):
     cam.rotation_euler = mathutils.Euler((xRad, 0, zRad), 'XYZ')
 
 
-def rotateCameraByAngle(camera,radians_angle,target_location):
+def rotate_camera_by_angle(camera, radians_angle, target_location):
     camera_location_rotation = mathutils.Matrix.Rotation(radians_angle, 4, 'Z')
     camera.location.rotate(camera_location_rotation)
-    pointCameraToTarget(camera, target_location)
+    point_camera_to_target(camera, target_location)
 
 
-def deleteAndAddCorrectLightSource(meshObjectPos):
+def delete_and_add_correct_light_source(meshObjectPos):
     # deselect all
     bpy.ops.object.select_all(action='DESELECT')
 
@@ -63,30 +65,31 @@ def deleteAndAddCorrectLightSource(meshObjectPos):
 
     bpy.ops.object.lamp_add(type='HEMI', radius=1, view_align=False, location=(meshObjectPos.x, meshObjectPos.y, 10),
                             layers=(
-                            True, False, False, False, False, False, False, False, False, False, False, False, False,
-                            False, False, False,
-                            False, False, False, False))
+                                True, False, False, False, False, False, False, False, False, False, False, False,
+                                False,
+                                False, False, False,
+                                False, False, False, False))
 
 
 def main():
     camera = bpy.data.objects["Camera"]
     camera.rotation_mode = 'XYZ'
 
-    for object in bpy.data.objects:
-        if object.type == 'MESH':
-            deleteAndAddCorrectLightSource(object.location)
-            print(object.location)
+    for obj in bpy.data.objects:
+        if obj.type == 'MESH':
+            delete_and_add_correct_light_source(obj.location)
+            print(obj.location)
 
-            bpy.context.scene.objects.active = object
+            bpy.context.scene.objects.active = obj
 
             degree = 150  # how many degrees between each sample
 
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
             for background in os.listdir("Documents/background"):
-                backgroundPath = os.path.join("Documents/background", background)
-                backgroundName = os.path.splitext(background)[0]
-                add_background(backgroundPath)
+                background_path = os.path.join("Documents/background", background)
+                background_name = os.path.splitext(background)[0]
+                add_background(background_path)
 
                 for file in os.listdir("Documents/Texture"):
                     fname = os.path.join("Documents/Texture", file)
@@ -109,10 +112,10 @@ def main():
                             camera.location = (obj.location.x + 3, obj.location.y + 3, 7)
 
                         for x in range(1, number_of_frames):
-                            revolveCameraByFractionOfCircle(camera, rotate_angle, object)
+                            rotate_camera_by_angle(camera, rotate_angle, obj)
 
-                            bpy.context.scene.render.filepath = "Documents/test/%s/%s%s%sCameraPose%dFrame%d.png" % (
-                            object.name, backgroundName, object.name, texture_name, camera_pos, x)
+                            bpy.context.scene.render.file_path = "Documents/test/%s/%s%s%sCameraPose%dFrame%d.png" % (
+                                obj.name, background_name, obj.name, texture_name, camera_pos, x)
                             bpy.ops.render.render(write_still=True, use_viewport=True)
 
 
