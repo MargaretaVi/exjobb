@@ -96,37 +96,36 @@ def main(sys):
 
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
-            #for background in os.listdir(background_folder_full_path):
-            #    background_path = os.path.join(background_folder_full_path, background)
-            #    background_name = os.path.splitext(background)[0]
-            #    add_background(background_path)
+            for background in os.listdir(background_folder_full_path):
+                background_path = os.path.join(background_folder_full_path, background)
+                background_name = os.path.splitext(background)[0]
+                add_background(background_path)
 
-            for file in os.listdir(texture_folder_full_path):
-                fname = os.path.join(texture_folder_full_path, file)
-                texture_name = os.path.splitext(file)[0]
+                for file in os.listdir(texture_folder_full_path):
+                    fname = os.path.join(texture_folder_full_path, file)
+                    texture_name = os.path.splitext(file)[0]
 
-                obj = bpy.context.active_object
-                mat = material_for_texture(fname)
-                if len(obj.data.materials) < 1:
-                    obj.data.materials.append(mat)
-                else:
-                    obj.data.materials[0] = mat
-                for camera_pos in range(1, 5):
-                    if camera_pos == 1:
-                        camera.location = (7.4811, -6.5076, 5.3437)
-                    elif camera_pos == 2:
-                        camera.location = (camera.location.x, camera.location.y, camera.location.z - 7)
-                    elif camera_pos == 3:
-                        camera.location = (camera.location.x, camera.location.y, camera.location.z + 7)
+                    obj = bpy.context.active_object
+                    mat = material_for_texture(fname)
+                    if len(obj.data.materials) < 1:
+                        obj.data.materials.append(mat)
                     else:
-                        camera.location = (obj.location.x + 3, obj.location.y + 3, 7)
+                        obj.data.materials[0] = mat
+                    for camera_pos in range(1, 5):
+                        if camera_pos == 1:
+                            camera.location = (7.4811, -6.5076, 5.3437)
+                        elif camera_pos == 2:
+                            camera.location = (camera.location.x, camera.location.y, camera.location.z - 7)
+                        elif camera_pos == 3:
+                            camera.location = (camera.location.x, camera.location.y, camera.location.z + 7)
+                        else:
+                            camera.location = (obj.location.x + 3, obj.location.y + 3, 7)
 
-                    for x in range(1, number_of_frames):
-                        rotate_camera_by_angle(camera, rotate_angle, obj)
-                        bpy.context.scene.render.file_path = "Documents/test/car.png"
-                        #bpy.context.scene.render.file_path = "Documents/test/%s/%s%s%sCameraPose%dFrame%d.png" % (
-                         #   obj.name, obj.name, background_name, texture_name, camera_pos, x)
-                        bpy.ops.render.render(write_still=True, use_viewport=True)
+                        for x in range(1, number_of_frames):
+                            rotate_camera_by_angle(camera, rotate_angle, obj)
+                            bpy.context.scene.render.filepath = "Documents/test/%s/%s%s%sCameraPose%dFrame%d.png" % (
+                                obj.name, obj.name, background_name, texture_name, camera_pos, x)
+                            bpy.ops.render.render(write_still=True, use_viewport=True)
 
 
 if __name__ == "__main__":
