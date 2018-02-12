@@ -1,8 +1,8 @@
-import bpy, os, math, mathutils
+import bpy, os, math, mathutils, sys, pdb
 
 # camera.location = (7.4811, -6.5076, 5.3437) original camera position in blender
 
-bpy.context.scene.render.use_raytrace = False
+#bpy.context.scene.render.use_raytrace = False
 
 
 def add_background(filepath):
@@ -63,6 +63,7 @@ def delete_and_add_correct_light_source(meshObjectPos):
             bpy.data.objects[obj.name].select = True
             bpy.ops.object.delete()
 
+    # Add lamp object, type HEMI
     bpy.ops.object.lamp_add(type='HEMI', radius=1, view_align=False, location=(meshObjectPos.x, meshObjectPos.y, 10),
                             layers=(
                                 True, False, False, False, False, False, False, False, False, False, False, False,
@@ -71,28 +72,35 @@ def delete_and_add_correct_light_source(meshObjectPos):
                                 False, False, False, False))
 
 
-def main():
+def main(sys):
+    argv = sys.argv
+    argv = argv[argv.index("--") + 1:]
+    background_folder_path = argv[0]
+    background_folder_full_path = os.path.abspath(background_folder_path)
+    texture_folder_path = argv[1]
+    texture_folder_full_path = os.path.abspath(texture_folder_path)
+    saving_folder = argv[2]
+
     camera = bpy.data.objects["Camera"]
     camera.rotation_mode = 'XYZ'
 
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
-            delete_and_add_correct_light_source(obj.location)
-            print(obj.location)
 
+            delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
-            degree = 150  # how many degrees between each sample
+            degree = 5 
 
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
-            for background in os.listdir("Documents/background"):
-                background_path = os.path.join("Documents/background", background)
+            for background in os.listdir(background_folder_full_path):
+                background_path = os.path.join(background_folder_full_path, background)
                 background_name = os.path.splitext(background)[0]
                 add_background(background_path)
 
-                for file in os.listdir("Documents/Texture"):
-                    fname = os.path.join("Documents/Texture", file)
+                for file in os.listdir(texture_folder_full_path):
+                    fname = os.path.join(texture_folder_full_path, file)
                     texture_name = os.path.splitext(file)[0]
 
                     obj = bpy.context.active_object
@@ -102,6 +110,7 @@ def main():
                     else:
                         obj.data.materials[0] = mat
                     for camera_pos in range(1, 5):
+                        # Default blender camera position
                         if camera_pos == 1:
                             camera.location = (7.4811, -6.5076, 5.3437)
                         elif camera_pos == 2:
@@ -113,11 +122,10 @@ def main():
 
                         for x in range(1, number_of_frames):
                             rotate_camera_by_angle(camera, rotate_angle, obj)
-
-                            bpy.context.scene.render.file_path = "Documents/test/%s/%s%s%sCameraPose%dFrame%d.png" % (
-                                obj.name, obj.name,background_name, texture_name, camera_pos, x)
+                            bpy.context.scene.render.filepath = os.path.join(saving_folder,"/%s/%s%s%sCameraPose%dFrame%d.png" % (
+                                obj.name, obj.name, background_name, texture_name, camera_pos, x)
                             bpy.ops.render.render(write_still=True, use_viewport=True)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys)
