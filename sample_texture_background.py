@@ -2,20 +2,25 @@ import bpy, os, math, mathutils, sys, pdb
 
 # camera.location = (7.4811, -6.5076, 5.3437) original camera position in blender
 
-#bpy.context.scene.render.use_raytrace = False
+def render_resolution(img):
+    bpy.context.scene.render.resolution_percentage = 100
+    bpy.context.scene.render.resolution_x = img.resolution.x
+
+    bpy.context.scene.render.resolution_y = img.resolution.y
 
 
 def add_background(filepath):
     img = bpy.data.images.load(filepath)
+    render_resolution(img)
     for area in bpy.context.screen.areas:
         if area.type == 'VIEW_3D':
             space_data = area.spaces.active
-            bg = space_data.background_images.new()
-            bg.image = img
+            background = space_data.background_images.new()
+            background.image = img
             space_data.show_background_images = True
             break
-
-    texture = bpy.data.textures.new("Texture.001", 'IMAGE')
+    texture_name = os.path.splitext(filepath)[0]       
+    texture = bpy.data.textures.new(texture_name, 'IMAGE')
     texture.image = img
     bpy.data.worlds['World'].active_texture = texture
     bpy.context.scene.world.texture_slots[0].use_map_horizon = True
@@ -71,33 +76,46 @@ def delete_and_add_correct_light_source(meshObjectPos):
                                 False, False, False,
                                 False, False, False, False))
 
+def change_camera_location(camera_pos_index, camera_object, obj):
+    if camera_pos_index == 1: # Default blender camera position 
+        camera_object.location = (7.4811, -6.5076, 5.3437)
+    elif camera_pos_index == 2:
+        camera_object.location = (camera_object.location.x, camera_object.location.y, camera_object.location.z - 7)
+    elif camera_pos_index == 3:
+        camera_object.location = (camera_object.location.x, camera_object.location.y, camera_object.location.z + 7)
+    else:
+        camera_object.location = (obj.location.x + 3, obj.location.y + 3, 7)
 
 def main(sys):
+
     argv = sys.argv
     argv = argv[argv.index("--") + 1:]
+  
     background_folder_path = argv[0]
     background_folder_full_path = os.path.abspath(background_folder_path)
     texture_folder_path = argv[1]
     texture_folder_full_path = os.path.abspath(texture_folder_path)
     saving_folder = argv[2]
-
+    os.makedirs(saving_folder, exist_ok=True)
     camera = bpy.data.objects["Camera"]
     camera.rotation_mode = 'XYZ'
 
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
-
+            
             delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
-            degree = 5 
+            degree = 150
 
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
             for background in os.listdir(background_folder_full_path):
+
                 background_path = os.path.join(background_folder_full_path, background)
-                background_name = os.path.splitext(background)[0]
                 add_background(background_path)
+                background_name = os.path.splitext(background)[0]
+                
 
                 for file in os.listdir(texture_folder_full_path):
                     fname = os.path.join(texture_folder_full_path, file)
@@ -109,23 +127,13 @@ def main(sys):
                         obj.data.materials.append(mat)
                     else:
                         obj.data.materials[0] = mat
-                    for camera_pos in range(1, 5):
-                        # Default blender camera position
-                        if camera_pos == 1:
-                            camera.location = (7.4811, -6.5076, 5.3437)
-                        elif camera_pos == 2:
-                            camera.location = (camera.location.x, camera.location.y, camera.location.z - 7)
-                        elif camera_pos == 3:
-                            camera.location = (camera.location.x, camera.location.y, camera.location.z + 7)
-                        else:
-                            camera.location = (obj.location.x + 3, obj.location.y + 3, 7)
-
+                    for camera_pos_index in range(1, 5):
+                        change_camera_location(camera_pos_index, camera, obj)
+                        
                         for x in range(1, number_of_frames):
                             rotate_camera_by_angle(camera, rotate_angle, obj)
-                            bpy.context.scene.render.filepath = os.path.join(saving_folder,"/%s/%s%s%sCameraPose%dFrame%d.png" % (
-                                obj.name, obj.name, background_name, texture_name, camera_pos, x)
+                            bpy.context.scene.render.filepath = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dFrame%d.png") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
                             bpy.ops.render.render(write_still=True, use_viewport=True)
-
 
 if __name__ == "__main__":
     main(sys)
