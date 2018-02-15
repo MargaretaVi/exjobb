@@ -3,20 +3,14 @@ from PIL import Image
 
 # camera.location = (7.4811, -6.5076, 5.3437) original camera position in blender
 # (2.03913, -1.55791, 1.26075)
-def render_resolution(img, image_path):
+def render_resolution():
     bpy.context.scene.render.resolution_percentage = 100
-    #fetching information about the background image
-    #image = Image.open(image_path) 
-    #bpy.context.scene.render.resolution_x = image.width
-    #bpy.context.scene.render.resolution_y = image.height
-    bpy.context.scene.render.resolution_y = 256
-
     bpy.context.scene.render.resolution_x = 256
-
+    bpy.context.scene.render.resolution_y = 256
 
 def add_background(filepath):
     img = bpy.data.images.load(filepath)
-    render_resolution(img, filepath)
+    render_resolution()
     for area in bpy.context.screen.areas:
         if area.type == 'VIEW_3D':
             space_data = area.spaces.active
@@ -24,11 +18,11 @@ def add_background(filepath):
             background.image = img
             space_data.show_background_images = True
             break
-    #texture_name = os.path.splitext(filepath)[0]       
-    #texture = bpy.data.textures.new(texture_name, 'IMAGE')
-    #texture.image = img
-    #bpy.data.worlds['World'].active_texture = texture
-    #bpy.context.scene.world.texture_slots[0].use_map_horizon = True
+    texture_name = os.path.splitext(filepath)[0]       
+    texture = bpy.data.textures.new(texture_name, 'IMAGE')
+    texture.image = img
+    bpy.data.worlds['World'].active_texture = texture
+    bpy.context.scene.world.texture_slots[0].use_map_horizon = True
 
 
 def material_for_texture(fname):
@@ -83,15 +77,14 @@ def delete_and_add_correct_light_source(meshObjectPos):
 
 def change_camera_location(camera_pos_index, camera_object, obj):
     if camera_pos_index == 1: # Default blender camera position 
-        camera_object.location =obj.dimension
-        camera_object.location = (2.03913, -1.55791, 1.26075)
-        #camera_object.location = (7.4811, -6.5076, 5.3437)
+        #camera_object.location = (2.03913, -1.55791, 1.26075)
+        camera_object.location = (7.4811, -6.5076, 5.3437)
     elif camera_pos_index == 2:
         camera_object.location = (camera_object.location.x, camera_object.location.y, camera_object.location.z - 7)
     elif camera_pos_index == 3:
         camera_object.location = (camera_object.location.x, camera_object.location.y, camera_object.location.z + 7)
     else:
-        camera_object.location = (obj.location.x + 3, obj.location.y + 3, 7)
+        camera_object.location = (obj.location.x + 5, obj.location.y + 5, 10)
 
 def main(sys):
 
@@ -109,6 +102,7 @@ def main(sys):
 
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
+            bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
             delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
@@ -126,8 +120,9 @@ def main(sys):
                 for file in os.listdir(texture_folder_full_path):
                     fname = os.path.join(texture_folder_full_path, file)
                     texture_name = os.path.splitext(file)[0]
-                    if background_name == "black" and texture_name != white:
-                        break     
+
+                    if (texture_name == "white" and background_name != "black") or (background_name == "black" and texture_name != "white"):
+                        continue
                     obj = bpy.context.active_object
                     mat = material_for_texture(fname)
                     if len(obj.data.materials) < 1:
