@@ -17,12 +17,14 @@ def add_background(filepath):
             background = space_data.background_images.new()
             background.image = img
             space_data.show_background_images = True
+            background.view_axis = 'CAMERA'
             break
     texture_name = os.path.splitext(filepath)[0]       
     texture = bpy.data.textures.new(texture_name, 'IMAGE')
     texture.image = img
     bpy.data.worlds['World'].active_texture = texture
     bpy.context.scene.world.texture_slots[0].use_map_horizon = True
+    bpy.context.scene.world.use_sky_paper = True
 
 
 def material_for_texture(fname):
