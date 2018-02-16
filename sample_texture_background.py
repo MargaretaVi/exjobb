@@ -108,7 +108,7 @@ def main(sys):
             delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
-            degree = 150
+            degree = 5
 
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
