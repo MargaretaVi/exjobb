@@ -108,7 +108,7 @@ def main(sys):
             delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
-            degree = 150
+            degree = 5
 
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
@@ -136,7 +136,7 @@ def main(sys):
                         
                         for x in range(1, number_of_frames):
                             rotate_camera_by_angle(camera, rotate_angle, obj)
-                            bpy.context.scene.render.filepath = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dFrame%d.png") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
+                            bpy.context.scene.render.filepath = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
                             bpy.ops.render.render(write_still=True, use_viewport=True)
 
 if __name__ == "__main__":
