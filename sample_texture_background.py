@@ -89,7 +89,7 @@ def change_camera_location(camera_pos_index, camera_object, obj):
         camera_object.location = (obj.location.x + 5, obj.location.y + 5, 10)
 
 def main(sys):
-
+    bpy.context.scene.render.image_settings.file_format = 'JPEG'
     argv = sys.argv
     argv = argv[argv.index("--") + 1:]
   
@@ -108,7 +108,7 @@ def main(sys):
             delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
-            degree = 5
+            degree = 150
 
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
