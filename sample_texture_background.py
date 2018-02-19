@@ -110,7 +110,7 @@ def main(sys):
     camera = bpy.data.objects["Camera"]
     camera.rotation_mode = 'XYZ'
     
-"""
+
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
             bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
@@ -150,6 +150,6 @@ def main(sys):
                                 saving_path = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
                             bpy.context.scene.render.filepath = saving_path
                             bpy.ops.render.render(write_still=True, use_viewport=True)
-"""
+
 if __name__ == "__main__":
     main(sys)
