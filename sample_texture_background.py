@@ -5,8 +5,8 @@ from PIL import Image
 # (2.03913, -1.55791, 1.26075)
 def render_resolution():
     bpy.context.scene.render.resolution_percentage = 100
-    bpy.context.scene.render.resolution_x = 256
-    bpy.context.scene.render.resolution_y = 256
+    bpy.context.scene.render.resolution_x = 512
+    bpy.context.scene.render.resolution_y = 512
 
 def add_background(filepath):
     img = bpy.data.images.load(filepath)
@@ -52,12 +52,20 @@ def point_camera_to_target(cam, object):
 
     cam.rotation_euler = mathutils.Euler((xRad, 0, zRad), 'XYZ')
 
-
-def rotate_camera_by_angle(camera, radians_angle, target_location):
+def rotate_camera_by_angle(camera, radians_angle, object):
     camera_location_rotation = mathutils.Matrix.Rotation(radians_angle, 4, 'Z')
     camera.location.rotate(camera_location_rotation)
-    point_camera_to_target(camera, target_location)
+    point_camera_to_target(camera, object)
 
+def look_at(cam, point):
+    loc_camera = cam.matrix_world.to_translation()
+
+    direction = point - loc_camera
+    # point the cameras '-Z' and use its 'Y' as up
+    rot_quat = direction.to_track_quat('-Z', 'Y')
+
+    # assume we're using euler rotation
+    obj_camera.rotation_euler = rot_quat.to_euler()
 
 def delete_and_add_correct_light_source(meshObjectPos):
     # deselect all
@@ -101,15 +109,15 @@ def main(sys):
     os.makedirs(saving_folder, exist_ok=True)
     camera = bpy.data.objects["Camera"]
     camera.rotation_mode = 'XYZ'
-
+    
+"""
     for obj in bpy.data.objects:
         if obj.type == 'MESH':
             bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
             delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
-            degree = 5
-
+            degree = 150
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
             for background in os.listdir(background_folder_full_path):
@@ -136,8 +144,12 @@ def main(sys):
                         
                         for x in range(1, number_of_frames):
                             rotate_camera_by_angle(camera, rotate_angle, obj)
-                            bpy.context.scene.render.filepath = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
+                            if (texture_name == "white" and background_name == "black"):
+                                saving_path = os.path.join(saving_folder, ("groundTruth/%s/%s%s%sCameraPose%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
+                            else:
+                                saving_path = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
+                            bpy.context.scene.render.filepath = saving_path
                             bpy.ops.render.render(write_still=True, use_viewport=True)
-
+"""
 if __name__ == "__main__":
     main(sys)
