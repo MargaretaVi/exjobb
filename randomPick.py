@@ -9,6 +9,8 @@ def main(sys):
 	how_many_percentage = float(sys.argv[3])
 	
 	for subdir in os.listdir(input_folder):
+		if subdir != "turnKnob":
+			continue
 		directory = os.path.join(input_folder, subdir)
 		if os.path.isdir(directory):
 			directory = directory + '/'
@@ -19,10 +21,14 @@ def main(sys):
 			filenames = random.choice(all_files_in_dir, number_of_files_to_move)		
 			for name in filenames:
 				scrpath = os.path.join(directory_full_path,name)
-				tmp_name = output_folder + '/' + subdir
-				dstpath = os.path.join(os.path.abspath(tmp_name) + '/' ,name)	
-				shutil.copyfile(scrpath, dstpath)
-
+				tmp_folder_name = output_folder + '/' + subdir
+				os.makedirs(tmp_folder_name, exist_ok=True)
+				dstpath = os.path.join(os.path.abspath(tmp_folder_name) + '/' ,name)
+				try:	
+					shutil.move(scrpath, dstpath)
+				except:
+					print("moving file failed", name)
+					continue		
 	print("finished")
 
 # counts files in a folder

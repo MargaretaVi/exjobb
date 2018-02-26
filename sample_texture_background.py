@@ -89,12 +89,15 @@ def change_camera_location(camera_pos_index, camera_object, obj):
     if camera_pos_index == 1: # Default blender camera position 
         #camera_object.location = (2.03913, -1.55791, 1.26075)
         camera_object.location = (7.4811, -6.5076, 5.3437)
+    else:
+        camera_object.location = (obj.location.x + 5, obj.location.y + 5, 10)
+    """
     elif camera_pos_index == 2:
         camera_object.location = (camera_object.location.x, camera_object.location.y, camera_object.location.z - 7)
     elif camera_pos_index == 3:
         camera_object.location = (camera_object.location.x, camera_object.location.y, camera_object.location.z + 7)
-    else:
-        camera_object.location = (obj.location.x + 5, obj.location.y + 5, 10)
+    """
+
 
 def main(sys):
     bpy.context.scene.render.image_settings.file_format = 'JPEG'
@@ -117,39 +120,58 @@ def main(sys):
             delete_and_add_correct_light_source(obj.location)
             bpy.context.scene.objects.active = obj
 
-            degree = 150
+            degree = 60
             rotate_angle = math.radians(degree)
             number_of_frames = int(360 / degree)
-            for background in os.listdir(background_folder_full_path):
+            for scale_index in range(1,3):
+                change_scale_of_object(obj, scale_index)
 
-                background_path = os.path.join(background_folder_full_path, background)
-                add_background(background_path)
-                background_name = os.path.splitext(background)[0]
+                for background in os.listdir(background_folder_full_path):
+
+                    background_path = os.path.join(background_folder_full_path, background)
+                    add_background(background_path)
+                    background_name = os.path.splitext(background)[0]
                 
+                    for file in os.listdir(texture_folder_full_path):
+                        fname = os.path.join(texture_folder_full_path, file)
+                        texture_name = os.path.splitext(file)[0]
 
-                for file in os.listdir(texture_folder_full_path):
-                    fname = os.path.join(texture_folder_full_path, file)
-                    texture_name = os.path.splitext(file)[0]
+                        if (texture_name == "white" and background_name != "black") or (background_name == "black" and texture_name != "white"):
+                            continue
+                        obj = bpy.context.active_object
+                        mat = material_for_texture(fname)
+                        if len(obj.data.materials) < 1:
+                            obj.data.materials.append(mat)
+                        else:
+                            obj.data.materials[0] = mat
+                        for index in range(1, 3):
+                            change_camera_location(index, camera, obj)
 
-                    if (texture_name == "white" and background_name != "black") or (background_name == "black" and texture_name != "white"):
-                        continue
-                    obj = bpy.context.active_object
-                    mat = material_for_texture(fname)
-                    if len(obj.data.materials) < 1:
-                        obj.data.materials.append(mat)
-                    else:
-                        obj.data.materials[0] = mat
-                    for camera_pos_index in range(1, 5):
-                        change_camera_location(camera_pos_index, camera, obj)
-                        
-                        for x in range(1, number_of_frames):
-                            rotate_camera_by_angle(camera, rotate_angle, obj)
-                            if (texture_name == "white" and background_name == "black"):
-                                saving_path = os.path.join(saving_folder, ("groundTruth/%s/%s%s%sCameraPose%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
-                            else:
-                                saving_path = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, camera_pos_index, x))
-                            bpy.context.scene.render.filepath = saving_path
-                            bpy.ops.render.render(write_still=True, use_viewport=True)
+                            for x in range(1, number_of_frames):
+                                rotate_camera_by_angle(camera, rotate_angle, obj)
+                                if (texture_name == "white" and background_name == "black"):
+                                    saving_path = os.path.join(saving_folder, ("groundTruth/%s/%s%s%sCameraPose%dScale%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, index, scale_index, x))
+                                else:
+                                    saving_path = os.path.join(saving_folder,("%s/%s%s%sCameraPose%dScale%dFrame%d.jpeg") % (obj.name, obj.name, background_name, texture_name, index,scale_index,  x))
+                                bpy.context.scene.render.filepath = saving_path
+                                bpy.ops.render.render(write_still=True, use_viewport=True)
+                 
+def change_scale_of_object(obj, index):
+    x_scale = obj.scale[0]
+    y_scale = obj.scale[1]
+    z_scale = obj.scale[2]
+    
+    if index == 1:
+        scale_factor = x_scale * 0.4
+        obj.scale[0] = x_scale - scale_factor
+        obj.scale[1] = y_scale - scale_factor
+        obj.scale[2] = z_scale - scale_factor
+    else: 
+        scale_factor = x_scale * 0.6
+        obj.scale[0] = x_scale - scale_factor
+        obj.scale[1] = y_scale - scale_factor
+        obj.scale[2] = z_scale - scale_factor
+    
 
 if __name__ == "__main__":
     main(sys)
