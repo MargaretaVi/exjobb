@@ -26,11 +26,11 @@ def xml_parser(xml_file,saving_file):
 						
 						if attrib.tag == 'ymax':
 							ymax = attrib.text			
-					string = "image_name:%s label:%s xmin:%s ymin:%s xmax:%s ymax:%s" % (filename, label, xmin, xmax, ymin, ymax)	
+					string = "image_name:%s label:%s ymin:%s xmin:%s ymax:%s xmax:%s" % (filename, label, ymin, xmin, ymax, xmax)	
 					saving_file.write(string)
 					saving_file.write('\n')
 
-
+"image_name:%s label:%s ymin:%s xmin:%s ymax:%s xmax:%s "
 
 for file in os.listdir(GROUND_TRUTH_XML_FILE_DIR):
 	if file.endswith('.xml'):
