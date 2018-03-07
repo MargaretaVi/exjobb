@@ -40,21 +40,24 @@ def compare_files(pred_file, GT_file):
 	convert_file_to_dict(GT_file, GT_dict)
 	
 	for pred_object, pred_object_dict in pred_dict.items():
-		label = pred_object_dict['label']
+		pred_label = pred_object_dict['label']
 		pred_box = create_list_of_values_for_bb(pred_object_dict)
 		for GT_object, GT_object_dict in GT_dict.items():
-			label_GT = GT_object_dict['label']
-			if label_GT == label:
-				GT_box = create_list_of_values_for_bb(GT_object_dict)
-				#calculate IOU
-				iou = bounding_box_intersection_over_union(pred_box, GT_box)
-				if iou >= 0.5:
+			GT_box = create_list_of_values_for_bb(GT_object_dict)			
+			GT_label = GT_object_dict['label']
+			iou = bounding_box_intersection_over_union(pred_box, GT_box)
+			if iou >= 0.5:
+				if pred_label == GT_label:
 					true_positive += 1
-			else:
-				continue:
-		#false_negative += 1
+				else:
+					false_positive += 1
+			else: # iou < 0.5
+				if pred_label == GT_label:
+					false_negative += 1
+				else:
+					true_negative += 1			
 
-	average_precision = true_positive/(true_positive+false_positive)
+	precision = true_positive/(true_positive+false_positive)
 
 	recall = true_positive/(true_positive+false_negative)	
 
