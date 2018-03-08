@@ -43,7 +43,7 @@ def compare_files(pred_file, GT_file):
 		pred_label = pred_object_dict['label']
 		pred_box = create_list_of_values_for_bb(pred_object_dict)
 		for GT_object, GT_object_dict in GT_dict.items():
-			GT_box = create_list_of_values_for_bb(GT_object_dict)			
+			GT_box = create_list_of_values_for_bb(GT_object_dict)
 			GT_label = GT_object_dict['label']
 			iou = bounding_box_intersection_over_union(pred_box, GT_box)
 			if iou >= 0.5:
@@ -55,11 +55,11 @@ def compare_files(pred_file, GT_file):
 				if pred_label == GT_label:
 					false_negative += 1
 				else:
-					true_negative += 1			
+					true_negative += 1
 
-	precision = true_positive/(true_positive+false_positive)
+	precision = true_positive / (true_positive + false_positive)
 
-	recall = true_positive/(true_positive+false_negative)	
+	recall = true_positive / (true_positive + false_negative)
 
 def create_list_of_values_for_bb(dict):
 	box = [dict['ymin'], dict['xmin'], dict['ymax'], dict['xmax']]
