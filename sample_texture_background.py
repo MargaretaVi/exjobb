@@ -205,18 +205,44 @@ def clamp(x, minimum, maximum):
 
 def write_to_xml(saving_image_path, render_resolution, scene, cam_obj, obj):
     fname = os.path.basename(saving_image_path)
+    folder = 
     width = render_resolution.x
     height = render_resolution.y
     name = obj.name
-
 
     (xmin, ymin, width, height) = parse_bb_box(camera_view_bounds_2d(scene, cam_obj, obj))
 
 
 
+
 def parse_bb_box(bbox):
-    
+    xmin = get_xmin(bbox)
+    width = get_width(bbox)
+    ymin = get_ymin(bbox)
+    height = get_height(bbox)
+
     return xmin, ymin, width, height
+
+def get_xmin(line):
+    find = re.compile('x=(?=)(\d*)(?<=),')
+    xmin = re.search(find, line).group(1)
+    return xmin
+
+def get_ymin(line):
+    find = re.compile('y=(?=)(\d*)(?<=),')
+    ymin = re.search(find, line).group(1)
+    return ymin
+
+def get_width(line):
+    find = re.compile('width=(?=)(\d*)(?<=),')
+    xmax = re.search(find, line).group(1)
+    return xmax
+
+def get_height(line):
+    find = re.compile('height=(?=)(\d*)(?<=)')
+    ymax = re.search(find, line).group(1)
+    return ymax
+
 
 
 def main(sys):
