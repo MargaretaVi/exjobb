@@ -1,8 +1,11 @@
 #! /bin/bash
+start_time="$(date -u +%s)"
 
-for file in data/several_obj_blend_files/*; do
+for file in /home/xmreality/Documents/exjobb/data/blendFiler/*; do
 	if [[ $file = *.blend ]]; then 
-		blender $file --background --python several_object_rendering.py -- ~/Desktop/texture/ ~/Desktop/background/ ~/Desktop/GTimages/ $file
+		blender $file --background --python Rendering_v2.py -- real_img/background real_img/texture ~/Desktop/images $file
 	fi
 done	
-
+end_time="$(date -u +%s)"
+elapsed="$(($end_time-$start_time))"
+echo "Total of $elapsed seconds elapsed for process"

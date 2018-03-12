@@ -256,8 +256,7 @@ def write_to_xml(saving_image_path, render_res, scene, cam_obj, obj_dict):
         ET.SubElement(bbox, "xmax").text = str(xmax)
         ET.SubElement(bbox, "ymax").text = str(ymax)
 
-    tree = ET.ElementTree(annotation) 
- 
+    tree = ET.ElementTree(annotation)  
     tree.write(xml_filename)  
 
 def check_truncated(xmin, ymin, xmax, ymax, image_resolution):
@@ -313,7 +312,7 @@ def main(sys):
     saving_folder = argv[2]
     os.makedirs(saving_folder, exist_ok=True)
     blend_file = argv[3]
-    blend_file_name = os.path.splitext(blend_file)[0]
+    blend_file_name = os.path.basename(os.path.splitext(blend_file)[0])
 
     render_resolution()
     render_res =(bpy.context.scene.render.resolution_x, 
@@ -362,7 +361,7 @@ def main(sys):
                     scale_index = random.randint(0,3)
                     change_scale_of_object(render_object, scale_index)
                     rotate_camera_by_angle(camera, rotate_angle, render_object)
-                    saving_path = os.path.join(saving_folder, ("image_%d.jpeg") % (counter))
+                    saving_path = os.path.join(saving_folder, ("%s_image_%d.jpeg") % (blend_file_name, counter))
                     counter += 1       
                     bpy.context.scene.render.filepath = saving_path
                     bpy.ops.render.render(write_still=True, use_viewport=True)
