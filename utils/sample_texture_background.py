@@ -157,6 +157,8 @@ def main(sys):
                                 counter += 1
                  
                  
+def 
+
 def change_scale_of_object(obj, index):
     x_scale = obj.scale[0]
     y_scale = obj.scale[1]

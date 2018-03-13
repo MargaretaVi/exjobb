@@ -14,10 +14,14 @@ ET.SubElement(obj, "xmin").text = "xmin"
 ET.SubElement(obj, "ymin").text = "width"
 ET.SubElement(obj, "width").text = "width"
 ET.SubElement(obj, "height").text = "height"
+obj = ET.SubElement(annotation, "object")
+ET.SubElement(obj, "xmin").text = "xmin"
+ET.SubElement(obj, "ymin").text = "width"
+ET.SubElement(obj, "width").text = "width"
+ET.SubElement(obj, "height").text = "height"
 tree = ET.ElementTree(annotation)
 tree.write('/home/xmreality/Desktop/xmlTest.xml')
 
 
-def add_each_object(root, obj):
+def add_each_object_to_xml(root, obj):
 	obj_node = ET.SubElement(root, "object")
-	

@@ -404,6 +404,7 @@ def change_scale_of_object(obj, index):
     else:
         pass    
 
+#Reset scale of object
 def reset_scale(obj,index):
     x_scale = obj.scale[0]
     y_scale = obj.scale[1]
@@ -420,6 +421,9 @@ def reset_scale(obj,index):
         obj.scale[2] = z_scale + scale_factor    
     else:
         pass   
+
+def set_object_to_be_scale(obj, index):
+    
 
 if __name__ == "__main__":
     main(sys)
