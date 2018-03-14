@@ -46,21 +46,33 @@ def material_for_texture(fname):
     return mat
 
 
-def point_camera_to_target(cam, object):
-    # we want to point the camera towards the object.location(x,y,z), we rotate around the z-axis
-    dx = object.location.x - cam.location.x
-    dy = object.location.y - cam.location.y
-    dz = object.location.z - cam.location.z
+def point_camera_to_target(cam, position):
+    # we want to point the camera towards the positon(x,y,z), we rotate around the z-axis
+
+    dx = position[0] - cam.location.x
+    dy = position[1] - cam.location.y
+    dz = position[2] - cam.location.z
     xRad = (math.pi / 2.) + math.atan2(dz, math.sqrt(dy ** 2 + dx ** 2))
     zRad = math.atan2(dy, dx) - (math.pi / 2.)
 
     cam.rotation_euler = mathutils.Euler((xRad, 0, zRad), 'XYZ')
 
-
-def rotate_camera_by_angle(camera, radians_angle, object):
+def rotate_camera_by_angle(camera, radians_angle, obj):
     camera_location_rotation = mathutils.Matrix.Rotation(radians_angle, 4, 'Z')
     camera.location.rotate(camera_location_rotation)
-    point_camera_to_target(camera, object)
+    rand_index = random.randint(0,2)
+
+    position = ((obj.location.x, obj.location.y, obj.location.z))
+    rand_x = random.randint(-4,4)
+    rand_y = random.randint(-4,4)
+    rand_z = random.randint(-4,4)
+    if rand_index == 0:
+        # point towards object center
+        pass
+    elif rand_index == 1:
+        position = ((obj.location.x + rand_x, obj.location.y + rand_y, obj.location.z + rand_z))
+   
+    point_camera_to_target(camera, position)
 
 
 def look_at(cam, point):
@@ -336,16 +348,6 @@ def main(sys):
             bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
             object_dictionary[obj.name] = obj
 
-    """
-    for key in object_dictionary:
-        render_object = object_dictionary[key]
-        #Get a texture
-        rand_texture = random.choice(list_of_texture)
-        fname = os.path.join(texture_folder_full_path, rand_texture)
-        add_texture_to_object(render_object, fname)
-        #randomly change the scale of an object
-        change_scale_of_object(render_object, random.randint(0,3))
-    """
 
     #Setting the background
     for background in os.listdir(background_folder_full_path):
@@ -357,16 +359,17 @@ def main(sys):
                 add_texture_to_all_objects(object_dictionary, list_of_texture, texture_folder_full_path)
                 for key in object_dictionary:
                     render_object= object_dictionary[key]
+                    scale_factor = 0.2*render_object.scale[0]
                     #randomly change the scale of an object
-                    scale_index = random.randint(0,3)
-                    change_scale_of_object(render_object, scale_index)
+                    choice = random.randint(0,3)
+                    change_scale_of_object(render_object, choice, scale_factor)
                     rotate_camera_by_angle(camera, rotate_angle, render_object)
                     saving_path = os.path.join(saving_folder, ("%s_image_%d.jpeg") % (blend_file_name, counter))
                     counter += 1       
                     bpy.context.scene.render.filepath = saving_path
                     bpy.ops.render.render(write_still=True, use_viewport=True)
                     write_to_xml(saving_path,render_res, scene, camera, object_dictionary)
-                    reset_scale(render_object,scale_index)
+                    reset_scale(render_object,choice, scale_factor)
 
 def add_texture_to_all_objects(object_dict, list_of_texture, texture_folder_full_path):
     for key in object_dict:     
@@ -386,13 +389,12 @@ def add_texture_to_object(obj,texture_full_path):
 
 
 #Change the scale of object
-def change_scale_of_object(obj, index):
+def change_scale_of_object(obj, index, scale_factor):
     x_scale = obj.scale[0]
     y_scale = obj.scale[1]
     z_scale = obj.scale[2]
-    scale_factor = 0.3
-    if index == 0:
 
+    if index == 0:
         obj.scale[0] = x_scale - scale_factor
         obj.scale[1] = y_scale - scale_factor
         obj.scale[2] = z_scale - scale_factor
@@ -401,24 +403,32 @@ def change_scale_of_object(obj, index):
         obj.scale[0] = x_scale + scale_factor
         obj.scale[1] = y_scale + scale_factor
         obj.scale[2] = z_scale + scale_factor    
+    elif index == 2:
+        obj.scale[0] = x_scale + 2*scale_factor
+        obj.scale[1] = y_scale + 2*scale_factor
+        obj.scale[2] = z_scale + 2*scale_factor      
     else:
         pass    
 
 #Reset scale of object
-def reset_scale(obj,index):
+def reset_scale(obj,index, scale_factor):
     x_scale = obj.scale[0]
     y_scale = obj.scale[1]
     z_scale = obj.scale[2]
-    scale_factor = 0.3
-    if index == 1:
-        obj.scale[0] = x_scale - scale_factor
-        obj.scale[1] = y_scale - scale_factor
-        obj.scale[2] = z_scale - scale_factor
-
-    elif index == 0:
+    
+    if index == 0:
         obj.scale[0] = x_scale + scale_factor
         obj.scale[1] = y_scale + scale_factor
-        obj.scale[2] = z_scale + scale_factor    
+        obj.scale[2] = z_scale + scale_factor
+
+    elif index == 1:
+        obj.scale[0] = x_scale - scale_factor
+        obj.scale[1] = y_scale - scale_factor
+        obj.scale[2] = z_scale - scale_factor    
+    elif index == 2:
+        obj.scale[0] = x_scale - 2*scale_factor
+        obj.scale[1] = y_scale - 2*scale_factor
+        obj.scale[2] = z_scale - 2*scale_factor  
     else:
         pass   
 
