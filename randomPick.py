@@ -2,7 +2,7 @@ import os, shutil, sys, math, pdb, glob
 from numpy import random
 
 #Params: input folder with images
-# output folder where the images are going to be copied.
+# output folder where the images are going to be moved.
 # how many percentage are going to be moved
 def main(sys):
 	print("starting")
@@ -11,26 +11,26 @@ def main(sys):
 	os.makedirs(output_folder, exist_ok=True)
 	how_many_percentage = float(sys.argv[3])
 
-	for file in os.listdir(input_folder):
-		directory = input_folder + '/'
-		directory_full_path = os.path.abspath(directory)			
-		number_of_files_to_move = math.ceil(filecount(directory_full_path)*how_many_percentage)
-		all_images_in_dir = glob.glob(directory_full_path  + '/*.jpeg')
-		filenames = random.choice(all_images_in_dir, number_of_files_to_move)
-		for name in filenames:
-			basename = os.path.basename(file)
-			name = os.path.splitext(basename)[0]
+	print('creating list of files to copy')
+	all_images_in_dir = glob.glob(os.path.abspath(input_folder)  + '/*.jpeg')
+	number_of_files_to_move = math.ceil(len(all_images_in_dir)*how_many_percentage)
+	filenames = random.choice(all_images_in_dir, number_of_files_to_move)
 
-			scrpath_img = os.path.join(input_folder, basename)
-			dstpath_img = os.path.join(output_folder, basename)
-			xml_name = name + '.xml'
-			scrpath_xml = os.path.join(input_folder, xml_name)
-			dstpath_xml = os.path.join(output_folder, xml_name)
-			try:
-				shutil.copyfile(scrpath_img, dstpath_img)
-				shutil.copyfile(scrpath_xml, dstpath_xml)
-			except:
-				print('couldnt move', name)	
+	print('starting to copy files')	
+	for file in filenames:
+		basename = os.path.basename(file)
+		name = os.path.splitext(basename)[0]
+
+		scrpath_img = os.path.join(input_folder, basename)
+		dstpath_img = os.path.join(output_folder, basename)
+		xml_name = name + '.xml'
+		scrpath_xml = os.path.join(input_folder, xml_name)
+		dstpath_xml = os.path.join(output_folder, xml_name)
+		try:
+			shutil.move(scrpath_img, dstpath_img)
+			shutil.move(scrpath_xml, dstpath_xml)
+		except:
+			print('couldnt move', name)	
 
 	print("finished")
 
