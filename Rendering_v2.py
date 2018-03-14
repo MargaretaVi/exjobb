@@ -422,8 +422,6 @@ def reset_scale(obj,index):
     else:
         pass   
 
-def set_object_to_be_scale(obj, index):
-    
 
 if __name__ == "__main__":
     main(sys)
