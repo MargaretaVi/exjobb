@@ -63,8 +63,8 @@ def rotate_camera_by_angle(camera, radians_angle, obj):
     rand_index = random.randint(0,2)
 
     position = ((obj.location.x, obj.location.y, obj.location.z))
-    rand_x = random.randint(-4,4)
-    rand_y = random.randint(-4,4)
+    rand_x = random.randint(-6,6)
+    rand_y = random.randint(-6,6)
     rand_z = random.randint(-4,4)
     if rand_index == 0:
         # point towards object center
@@ -335,7 +335,7 @@ def main(sys):
     scene = bpy.context.scene
 
     counter = 0
-    degree = 20
+    degree = 15
     rotate_angle = math.radians(degree)
     number_of_frames = int(360 / degree)
 
