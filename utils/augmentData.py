@@ -11,9 +11,9 @@ def main(sys):
 	input_folder = os.path.abspath(input_folder)
 	rotate_angle = int(rotate_angle)
 
-	number_of_files_to_move = math.ceil(filecount(input_folder)*how_many_percentage)
+	number_of_files = math.ceil(filecount(input_folder)*how_many_percentage)
 	all_files_in_dir = os.listdir(input_folder)
-	filenames = random.choice(all_files_in_dir, number_of_files_to_move)	
+	filenames = random.choice(all_files_in_dir, number_of_files)	
 
 	for file in filenames:
 		file_path = input_folder + '/' + file
@@ -44,7 +44,7 @@ def rot_img(img, rot_angle):
 
 # counts files in a folder
 def filecount(folder_path):
-	numfiles = sum(1 for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f)))
+	numfiles = sum(1 for f in os.listdir(folder_path) if (os.path.isfile(os.path.join(folder_path, f)) and os.path.join(folder_path,f).endswith('.jpeg')))
 	return numfiles
 
 if __name__ == '__main__':
