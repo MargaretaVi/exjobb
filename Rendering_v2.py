@@ -232,7 +232,7 @@ def write_to_xml(saving_image_path, render_res, scene, cam_obj, obj_dict):
     width = render_res[0]
     height = render_res[1]
     #creating the tree
-    annotation = ET.Element("annontation")
+    annotation = ET.Element("annotation")
     ET.SubElement(annotation, "folder").text = folder
     ET.SubElement(annotation, "filename").text = fname
     ET.SubElement(annotation, "path").text = saving_image_path
